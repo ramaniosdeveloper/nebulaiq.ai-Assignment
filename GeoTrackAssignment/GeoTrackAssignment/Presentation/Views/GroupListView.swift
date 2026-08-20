@@ -7,98 +7,133 @@
 
 import SwiftUI
 
+/// Displays all tracking groups available to the current user.
+///
+/// Responsibilities:
+/// - Loads the user's tracking groups.
+/// - Displays groups in a list.
+/// - Allows the user to select a group.
+/// - Navigates to group creation.
+/// - Displays errors reported by the view model.
 public struct GroupListView: View {
 
-    @StateObject private var vm: GroupViewModel
+    // MARK: - Properties
 
+    @StateObject private var viewModel: GroupViewModel
+
+    // MARK: - Initialization
+
+    /// Creates a group list view.
+    ///
+    /// - Parameter viewModel: The view model responsible for
+    ///   managing tracking groups.
     public init(viewModel: GroupViewModel) {
-        _vm = StateObject(wrappedValue: viewModel)
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
+
+    // MARK: - Body
 
     public var body: some View {
         NavigationStack {
-            List(vm.groups, id: \.id.rawValue) { group in
-                Button {
-                    vm.select(group: group)
-                } label: {
-                    Text(group.name)
-                }
-            }
-            .navigationTitle("My Groups")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink("Create") {
-                        CreateGroupView(vm: vm)
-                    }
-                }
-            }
-            .task {
-                await vm.loadGroups()
-            }
-            .alert(
-                "Error",
-                isPresented: Binding(
-                    get: {
-                        vm.statusMessage != nil
-                    },
-                    set: { newValue in
-                        if !newValue {
-                            vm.statusMessage = nil
+            groupList
+                .navigationTitle("My Groups")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        NavigationLink("Create") {
+                            CreateGroupView(vm: viewModel)
                         }
                     }
-                )
-            ) {
-                Button("OK") {
-                    vm.statusMessage = nil
                 }
-            } message: {
-                Text(vm.statusMessage ?? "")
-            }
+                .task {
+                    await viewModel.loadGroups()
+                }
+                .alert(
+                    "Error",
+                    isPresented: errorAlertBinding
+                ) {
+                    Button("OK") {
+                        viewModel.statusMessage = nil
+                    }
+                } message: {
+                    Text(viewModel.statusMessage ?? "")
+                }
         }
     }
 }
 
+// MARK: - View Components
+
+private extension GroupListView {
+
+    /// Displays all tracking groups available to the current user.
+    var groupList: some View {
+        List(viewModel.groups, id: \.id.rawValue) { group in
+            Button {
+                viewModel.select(group: group)
+            } label: {
+                Text(group.name)
+            }
+        }
+    }
+
+    /// Binding used to present and dismiss the error alert.
+    ///
+    /// The alert is displayed whenever `statusMessage`
+    /// contains an error message.
+    var errorAlertBinding: Binding<Bool> {
+        Binding(
+            get: {
+                viewModel.statusMessage != nil
+            },
+            set: { isPresented in
+                if !isPresented {
+                    viewModel.statusMessage = nil
+                }
+            }
+        )
+    }
+}
 
 // MARK: - Preview
 
-#Preview {
+#Preview("Group List") {
 
-    let groupRepo = PreviewGroupRepo()
-    let authRepo = PreviewAuthRepo()
+    let groupRepository = PreviewGroupRepository()
+    let authRepository = PreviewAuthRepository()
 
     let createGroupUseCase = CreateGroupUseCase(
-        groupRepo: groupRepo,
-        authRepo: authRepo
+        groupRepo: groupRepository,
+        authRepo: authRepository
     )
 
     let joinGroupUseCase = JoinGroupUseCase(
-        groupRepo: groupRepo,
-        authRepo: authRepo
+        groupRepo: groupRepository,
+        authRepo: authRepository
     )
 
     let reportLocationUseCase = ReportLocationUseCase(
-        locationRepo: PreviewLocationRepo(),
-        groupRepo: groupRepo,
-        notificationRepo: PreviewNotificationRepo(),
-        authRepo: authRepo
+        locationRepo: PreviewLocationRepository(),
+        groupRepo: groupRepository,
+        notificationRepo: PreviewNotificationRepository(),
+        authRepo: authRepository
     )
 
     let viewModel = GroupViewModel(
         createGroup: createGroupUseCase,
         joinGroup: joinGroupUseCase,
         reportLocation: reportLocationUseCase,
-        groupRepo: groupRepo,
-        authRepo: authRepo,
+        groupRepo: groupRepository,
+        authRepo: authRepository,
         locationService: LocationService()
     )
 
     GroupListView(viewModel: viewModel)
 }
 
-
 // MARK: - Preview Group Repository
 
-private final class PreviewGroupRepo: GroupRepository {
+/// In-memory group repository used only by SwiftUI previews.
+private final class PreviewGroupRepository: GroupRepository {
 
     func createGroup(
         name: String,
@@ -106,7 +141,7 @@ private final class PreviewGroupRepo: GroupRepository {
         owner: UserID
     ) async throws -> Group {
 
-        return Group(
+        Group(
             id: GroupID(
                 rawValue: UUID().uuidString
             ),
@@ -121,16 +156,14 @@ private final class PreviewGroupRepo: GroupRepository {
         to group: GroupID
     ) async throws -> Group {
 
-        return try await getGroup(
-            by: group
-        )
+        try await getGroup(by: group)
     }
 
     func getGroup(
         by id: GroupID
     ) async throws -> Group {
 
-        return Group(
+        Group(
             id: id,
             name: "Test Group",
             members: [
@@ -149,16 +182,14 @@ private final class PreviewGroupRepo: GroupRepository {
         geoFence: GeoFence
     ) async throws -> Group {
 
-        return try await getGroup(
-            by: groupID
-        )
+        try await getGroup(by: groupID)
     }
 
     func listGroups(
         for user: UserID
     ) async throws -> [Group] {
 
-        return [
+        [
             try await getGroup(
                 by: GroupID(
                     rawValue: "g1"
@@ -168,14 +199,14 @@ private final class PreviewGroupRepo: GroupRepository {
     }
 }
 
-
 // MARK: - Preview Auth Repository
 
-private final class PreviewAuthRepo: AuthRepository {
+/// Authentication repository used only by SwiftUI previews.
+private final class PreviewAuthRepository: AuthRepository {
 
     func currentUser() async throws -> User {
 
-        return User(
+        User(
             id: UserID(
                 rawValue: "u1"
             ),
@@ -185,24 +216,24 @@ private final class PreviewAuthRepo: AuthRepository {
     }
 }
 
-
 // MARK: - Preview Location Repository
 
-private final class PreviewLocationRepo: LocationRepository {
+/// Location repository used only by SwiftUI previews.
+private final class PreviewLocationRepository: LocationRepository {
 
     func postLocation(
         _ snapshot: LocationSnapshot,
         for group: GroupID
     ) async throws {
 
-        // Preview only
+        // Preview only.
     }
 }
 
-
 // MARK: - Preview Notification Repository
 
-private final class PreviewNotificationRepo: NotificationRepository {
+/// Notification repository used only by SwiftUI previews.
+private final class PreviewNotificationRepository: NotificationRepository {
 
     func notifyMembers(
         groupID: GroupID,
@@ -211,6 +242,6 @@ private final class PreviewNotificationRepo: NotificationRepository {
         body: String
     ) async throws {
 
-        // Preview only
+        // Preview only.
     }
 }
