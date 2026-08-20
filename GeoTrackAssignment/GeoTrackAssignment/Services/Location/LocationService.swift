@@ -10,6 +10,39 @@ import Foundation
 import CoreLocation
 import Combine
 
+// MARK: - Location Monitoring Service
+
+/// Abstraction for location and geofence monitoring.
+///
+/// The Presentation layer depends on this protocol instead of the
+/// concrete `LocationService` implementation. This makes the
+/// ViewModel easy to unit test by injecting a mock implementation.
+public protocol LocationMonitoringService: AnyObject {
+
+    /// Requests when-in-use location permission.
+    func requestPermissions()
+
+    /// Requests always location permission.
+    func requestAlwaysPermission()
+
+    /// Starts monitoring the geofence for the supplied group.
+    ///
+    /// - Parameter group: Tracking group whose geofence should be monitored.
+    func startMonitoring(for group: Group)
+
+    /// Stops all currently monitored geofences.
+    func stopMonitoring()
+
+    /// Returns the user's current location.
+    ///
+    /// - Returns: Current `CLLocation`.
+    /// - Throws: A location error when the location request fails.
+    func getCurrentLocation() async throws -> CLLocation
+}
+
+
+// MARK: - Location Service
+
 /// Provides location services and geofence monitoring for tracking groups.
 ///
 /// `LocationService` is responsible for:
@@ -38,7 +71,8 @@ public final class LocationService: NSObject, ObservableObject {
     @Published
     public private(set) var currentLocation: CLLocation?
 
-    /// Continuation used to bridge `CLLocationManager.requestLocation()`
+    /// Continuation used to bridge
+    /// `CLLocationManager.requestLocation()`
     /// with Swift Concurrency.
     private var locationContinuation:
         CheckedContinuation<CLLocation, Error>?
@@ -95,7 +129,9 @@ public final class LocationService: NSObject, ObservableObject {
 
         // Return the cached location when available.
         if let location = manager.location {
+
             updatePublishedLocation(location)
+
             return location
         }
 
@@ -142,8 +178,8 @@ public final class LocationService: NSObject, ObservableObject {
             identifier: group.id.rawValue
         )
 
-        // We only need to react when the user leaves the
-        // configured geofence.
+        // We only need to react when the user leaves
+        // the configured geofence.
         region.notifyOnEntry = false
         region.notifyOnExit = true
 
@@ -168,19 +204,25 @@ public final class LocationService: NSObject, ObservableObject {
     private func stopMonitoredRegions() {
 
         for region in manager.monitoredRegions {
+
             manager.stopMonitoring(for: region)
         }
     }
 
+
     /// Updates the published location on the main thread.
     ///
     /// - Parameter location: Latest device location.
-    private func updatePublishedLocation(_ location: CLLocation) {
+    private func updatePublishedLocation(
+        _ location: CLLocation
+    ) {
 
         DispatchQueue.main.async { [weak self] in
+
             self?.currentLocation = location
         }
     }
+
 
     /// Completes a pending `getCurrentLocation()` request.
     ///
@@ -198,6 +240,7 @@ public final class LocationService: NSObject, ObservableObject {
         continuation.resume(returning: location)
     }
 
+
     /// Fails a pending `getCurrentLocation()` request.
     ///
     /// - Parameter error: Error returned by Core Location.
@@ -214,6 +257,7 @@ public final class LocationService: NSObject, ObservableObject {
         continuation.resume(throwing: error)
     }
 
+
     /// Reports a location update to the application's business layer.
     ///
     /// - Parameters:
@@ -225,19 +269,24 @@ public final class LocationService: NSObject, ObservableObject {
     ) {
 
         Task {
+
             do {
+
                 try await Dependencies.reportLocationUseCase.execute(
                     groupID: group.id,
                     latitude: location.coordinate.latitude,
                     longitude: location.coordinate.longitude
                 )
+
             } catch {
+
                 print(
                     "Report location error: \(error.localizedDescription)"
                 )
             }
         }
     }
+
 
     /// Prints geofence configuration information for debugging.
     ///
@@ -259,10 +308,13 @@ public final class LocationService: NSObject, ObservableObject {
         print("==============================")
     }
 
+
     /// Prints the latest location information for debugging.
     ///
     /// - Parameter location: Latest device location.
-    private func logLocation(_ location: CLLocation) {
+    private func logLocation(
+        _ location: CLLocation
+    ) {
 
         print("========== LOCATION ==========")
         print("Lat: \(location.coordinate.latitude)")
@@ -271,6 +323,13 @@ public final class LocationService: NSObject, ObservableObject {
         print("==============================")
     }
 }
+
+
+// MARK: - LocationMonitoringService
+
+/// Makes the concrete location service available through
+/// the protocol abstraction.
+extension LocationService: LocationMonitoringService {}
 
 
 // MARK: - CLLocationManagerDelegate
@@ -289,24 +348,30 @@ extension LocationService: CLLocationManagerDelegate {
         switch manager.authorizationStatus {
 
         case .notDetermined:
+
             print("Location: NOT DETERMINED")
 
         case .authorizedWhenInUse:
+
             print("Location: WHEN IN USE")
 
             // Request Always permission for geofence monitoring.
             manager.requestAlwaysAuthorization()
 
         case .authorizedAlways:
+
             print("Location: ALWAYS")
 
         case .denied:
+
             print("Location: DENIED")
 
         case .restricted:
+
             print("Location: RESTRICTED")
 
         @unknown default:
+
             print("Location: UNKNOWN")
         }
     }
@@ -333,7 +398,9 @@ extension LocationService: CLLocationManagerDelegate {
         updatePublishedLocation(location)
 
         // Complete any pending async location request.
-        completeLocationRequest(with: location)
+        completeLocationRequest(
+            with: location
+        )
 
         // Report the location for the active tracking group.
         guard let group = currentGroup else {
@@ -394,6 +461,8 @@ extension LocationService: CLLocationManagerDelegate {
             "Location error: \(error.localizedDescription)"
         )
 
-        failLocationRequest(with: error)
+        failLocationRequest(
+            with: error
+        )
     }
 }

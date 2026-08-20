@@ -81,7 +81,8 @@ public enum Dependencies {
 
     /// Core Location service responsible for requesting permissions
     /// and monitoring the user's geofence.
-    public static let locationService =
+
+    public static let locationService: LocationService =
         LocationService()
 }
 

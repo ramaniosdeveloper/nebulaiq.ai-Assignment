@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "5CCABF13-FA5A-4363-8B11-CF5A783B0186",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:GeoTrackAssignment.xcodeproj",
+      "identifier" : "A26F40823036F63300428CDA",
+      "name" : "GeoTrackAssignment"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:GeoTrackAssignment.xcodeproj",
+        "identifier" : "A26F408F3036F63400428CDA",
+        "name" : "GeoTrackAssignmentTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:GeoTrackAssignment.xcodeproj",
+        "identifier" : "A26F40993036F63400428CDA",
+        "name" : "GeoTrackAssignmentUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

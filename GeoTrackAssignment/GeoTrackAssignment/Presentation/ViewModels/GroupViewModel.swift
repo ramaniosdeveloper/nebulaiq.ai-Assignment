@@ -60,7 +60,7 @@ public final class GroupViewModel: ObservableObject {
     private let authRepository: AuthRepository
 
     /// Service responsible for geo-fence and location monitoring.
-    private let locationService: LocationService
+    private let locationService: LocationMonitoringService
 
     // MARK: - Initialization
 
@@ -79,7 +79,7 @@ public final class GroupViewModel: ObservableObject {
         reportLocation: ReportLocationUseCase,
         groupRepo: GroupRepository,
         authRepo: AuthRepository,
-        locationService: LocationService
+        locationService: LocationMonitoringService
     ) {
         self.createGroupUseCase = createGroup
         self.joinGroupUseCase = joinGroup

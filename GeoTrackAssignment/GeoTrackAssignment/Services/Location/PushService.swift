@@ -23,28 +23,45 @@ public final class PushService: NSObject, UNUserNotificationCenterDelegate {
     ///
     /// - Throws: An error if the notification authorization request fails.
     public func requestAuthorization() async throws {
-
         let center = UNUserNotificationCenter.current()
-
-        // Set this service as the notification center delegate
-        // to handle notification-related events.
         center.delegate = self
 
-        // Request permission for alerts, badges, and notification sounds.
         let granted = try await center.requestAuthorization(
-            options: [
-                .alert,
-                .badge,
-                .sound
-            ]
+            options: [.alert, .sound, .badge]
         )
 
-        // Register the application with Apple Push Notification service
-        // only after the user grants notification permission.
-        if granted {
-            await MainActor.run {
-                UIApplication.shared.registerForRemoteNotifications()
-            }
+        guard granted else {
+            return
+        }
+    }
+
+    public func clearBadge() {
+        Task { @MainActor in
+            UNUserNotificationCenter.current().setBadgeCount(0)
+        }
+    }
+
+    public func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
+
+        // Clear badge when notification is received while app is active.
+        await MainActor.run {
+            UIApplication.shared.applicationIconBadgeNumber = 0
+        }
+
+        return [.banner, .sound]
+    }
+
+    public func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse
+    ) async {
+
+        // Clear badge when user taps the notification.
+        await MainActor.run {
+            UIApplication.shared.applicationIconBadgeNumber = 0
         }
     }
 }

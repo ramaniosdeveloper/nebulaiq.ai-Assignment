@@ -27,6 +27,7 @@
 		A26F40833036F63300428CDA /* GeoTrackAssignment.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GeoTrackAssignment.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A26F40903036F63400428CDA /* GeoTrackAssignmentTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GeoTrackAssignmentTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A26F409A3036F63400428CDA /* GeoTrackAssignmentUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GeoTrackAssignmentUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2C0B7A130375428007081DD /* GeoTrackAssignment.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = GeoTrackAssignment.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +76,7 @@
 		A26F407A3036F63300428CDA = {
 			isa = PBXGroup;
 			children = (
+				A2C0B7A130375428007081DD /* GeoTrackAssignment.xctestplan */,
 				A26F40853036F63300428CDA /* GeoTrackAssignment */,
 				A26F40933036F63400428CDA /* GeoTrackAssignmentTests */,
 				A26F409D3036F63400428CDA /* GeoTrackAssignmentUITests */,
@@ -387,6 +389,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 825K263N4U;
@@ -407,6 +410,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.-GeoTrackAssignment-com.GeoTrackAssignment";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -422,6 +426,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 825K263N4U;
@@ -442,6 +447,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.-GeoTrackAssignment-com.GeoTrackAssignment";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -460,7 +466,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 825K263N4U;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.-GeoTrackAssignment-com.GeoTrackAssignmentTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -482,7 +488,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 825K263N4U;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.-GeoTrackAssignment-com.GeoTrackAssignmentTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
