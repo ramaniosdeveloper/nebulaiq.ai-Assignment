@@ -1,11 +1,9 @@
 //
-//  Repositories.swift
+//  GroupRepository.swift
 //  GeoTrackAssignment
 //
 //  Created by Raman kumar on 20/08/26.
 //
-
-import Foundation
 
 // MARK: - Group Repository
 
@@ -78,70 +76,4 @@ public protocol GroupRepository {
     func listGroups(
         for user: UserID
     ) async throws -> [Group]
-}
-
-
-// MARK: - Location Repository
-
-/// Defines the data-access contract for user location information.
-///
-/// Implementations can store location snapshots locally or remotely.
-/// The domain layer does not need to know where the location data
-/// is persisted.
-public protocol LocationRepository {
-
-    /// Stores a location snapshot for a tracking group.
-    ///
-    /// - Parameters:
-    ///   - snapshot: Location information reported by a user.
-    ///   - group: Identifier of the tracking group.
-    /// - Throws: An error if the location cannot be stored.
-    func postLocation(
-        _ snapshot: LocationSnapshot,
-        for group: GroupID
-    ) async throws
-}
-
-
-// MARK: - Notification Repository
-
-/// Defines the contract for notifying members of a tracking group.
-///
-/// Implementations may use local notifications, APNs, or a backend
-/// notification service. The business layer remains independent of
-/// the actual notification mechanism.
-public protocol NotificationRepository {
-
-    /// Notifies group members about a tracking event.
-    ///
-    /// - Parameters:
-    ///   - groupID: Identifier of the group whose members should be notified.
-    ///   - excluding: User who should not receive the notification.
-    ///   - title: Notification title.
-    ///   - body: Notification message.
-    /// - Throws: An error if the notification cannot be delivered.
-    func notifyMembers(
-        groupID: GroupID,
-        excluding: UserID,
-        title: String,
-        body: String
-    ) async throws
-}
-
-
-// MARK: - Authentication Repository
-
-/// Defines the authentication data-access contract.
-///
-/// The domain layer uses this protocol to obtain information about
-/// the currently authenticated user without depending on a specific
-/// authentication provider.
-public protocol AuthRepository {
-
-    /// Returns the currently authenticated user.
-    ///
-    /// - Returns: The current authenticated user.
-    /// - Throws: An error if the current user cannot be retrieved
-    ///   or if authentication is unavailable.
-    func currentUser() async throws -> User
 }
